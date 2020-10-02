@@ -16,7 +16,7 @@ Shape reconstruction from sparse point clouds/images is challenging and a releva
 The kernal idea is to use dep learning network to mimic the process of deforming the template mesh under the guidence of contours.
 
 # Repo Contents:
-This code is based on Pixel2mesh, where the GCN block and the mesh loss are mainly from it.
+This code is based on [Pixel2mesh](https://github.com/nywang16/Pixel2Mesh), where the GCN block and the mesh loss are mainly from it.
 
 # Package dependencies:
 This repository is based on Python2.7, Tensorflow and Tensorlayer.
@@ -24,15 +24,15 @@ The version of the main packages is as follows,
 - Tensorflow==1.7.0
 - tflearn
 
-# Training
+# Training:
 Use the following command to train the MR-Net.
 > CUDA_VISIBLE_DEVICES=0 python train.py
 
-# Testing
+# Testing:
 Use the following command to test the MR-Net. Chamfer Distance (CD), Earth Mover Distance (EMD), Hausdorff Distance (HD) and Point cloud to point cloud (PC-to-PC) error are evaluated in this paper.
 > CUDA_VISIBLE_DEVICES=0 python test.py
 
-# Demo
+# Demo:
 To reconstruct 3D cardiac mesh with pretrained model from contours.
 > CUDA_VISIBLE_DEVICES=0 python demo.py
 
