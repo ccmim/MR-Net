@@ -14,21 +14,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Modifications: revise reading and printing of demo
+# Modifications: mesh/PC data reading and saving
 # Modifications copyright (C) 2013 <Xiang Chen>
 #
 import tensorflow as tf
 import pickle
 from skimage import io,transform
-from p2m.api import GCN
-from p2m.utils import *
+from mrnet.api import GCN
+from mrnet.utils import *
 
 import vtk
 from vtk.util.numpy_support import vtk_to_numpy 
 from scipy.spatial import ConvexHull
 from scipy.special import gammainc
 import trimesh
-from p2m.fetcher import *
+from mrnet.fetcher import *
 
 
 # Set random seed
@@ -39,7 +39,7 @@ tf.set_random_seed(seed)
 # Settings
 flags = tf.app.flags
 FLAGS = flags.FLAGS
-flags.DEFINE_string('image', 'Data/examples/plane.png', 'Testing image.')
+flags.DEFINE_string('test_file', 'test/1000739_ED.vtk', 'Testfile dir.')
 flags.DEFINE_float('learning_rate', 0., 'Initial learning rate.')
 flags.DEFINE_integer('hidden', 256, 'Number of units in  hidden layer.')
 flags.DEFINE_integer('feat_dim', 963, 'Number of units in perceptual feature layer.')
@@ -62,15 +62,6 @@ placeholders = {
     'pool_idx': [tf.placeholder(tf.int32, shape=(None, 2)) for _ in range(num_blocks-1)] # helper for graph unpooling
 }
 model = GCN(placeholders, logging=True)
-
-def load_image(img_path):
-	img = io.imread(img_path)
-	if img.shape[2] == 4:
-		img[np.where(img[:,:,3]==0)] = 255
-	img = transform.resize(img, (224,224))
-	img = img[:,:,:3].astype('float32')
-
-	return img
 
 def write_points_in_vtp(points, outfile='points.vtp', color=None):
     """
@@ -125,14 +116,11 @@ def write_points_in_vtp(points, outfile='points.vtp', color=None):
 def resample_pcd(pcd, n):
     """Drop or duplicate points so that pcd has exactly n points"""
     idx = np.random.permutation(pcd.shape[0])
-    #print(pcd.shape[0])
     if idx.shape[0] < n:
         idx = np.concatenate([idx, np.random.randint(pcd.shape[0], size = n - pcd.shape[0])])
     return pcd[idx[:n]]
 def readvtkgt(filename):
     # load a vtk file as input 
-    #reader = vtk.vtkXMLUnstructuredGridReader() 
-    #print(filename)
     reader = vtk.vtkPolyDataReader()
     reader.SetFileName(filename) 
     reader.ReadAllVectorsOn()
@@ -143,8 +131,7 @@ def readvtkgt(filename):
     triangles = cells.GetData()
     points = data.GetPoints()
     np_point = vtk_to_numpy(points.GetData()) 
-    np_point = resample_pcd(np_point,3000)
-    return np_point#[:1578,:]
+    return np_point
     
 def normalize_point_cloud(input):
     """
@@ -173,14 +160,12 @@ model.load(sess)
 pkl = pickle.load(open('Data/heart/cardiac_template.dat', 'rb')) #init1.dat info_ellipsoid.dat
 feed_dict = construct_feed_dict(pkl, placeholders)
 
-test_file = '/localhome/scxc/MICCAI/MICCAI2020_code_organization/data/LVRV_Shapes_Manual/Manual/test/1000739_ED.vtk'
+
 mode = 0 #0 full,  1 2 slices, 2-4  3-5 slices.
-img_inp = readvtk(test_file,mode)#readvtkgt(test_file)
+img_inp = readvtk(FLAGS.test_file,mode)
 img_inp = resample_pcd(img_inp,3000)
-img = np.load('/localhome/scxc/MICCAI/MICCAI2020_code_organization/data/mesh0826/test/1000739_ED-'+ str(mode) +'.npy')
 
-
-write_points_in_vtp(img_inp,'demo_output/input.vtp')
+write_points_in_vtp(img_inp,'demo/input.vtp')
 img_inp, center, radius = normalize_point_cloud(img_inp)
 def save_mesh(vert,face,path,id):
     pc_path = path.replace('.vtk', str(id)+'.vtp')
@@ -199,11 +184,11 @@ vert1 = (vert1 * radius) + center
 vert2 = (vert2 * radius) + center
 vert3 = (vert3 * radius) + center
 
-face1 = np.loadtxt('Data/ellipsoid/ori_face.obj', dtype='|S32')
-face2 = np.loadtxt('Data/ellipsoid/heart_face2.obj', dtype='|S32')
-face3 = np.loadtxt('Data/ellipsoid/heart_face3.obj', dtype='|S32')
+face1 = np.loadtxt('Data/heart/heart_face1.obj', dtype='|S32')
+face2 = np.loadtxt('Data/heart/heart_face2.obj', dtype='|S32')
+face3 = np.loadtxt('Data/heart/heart_face3.obj', dtype='|S32')
 
-test_file = 'demo_output/test.vtk'
+test_file = 'demo/test.vtk'
 save_mesh(vert1,face1,test_file,1)
 save_mesh(vert2,face2,test_file,2)
 save_mesh(vert3,face3,test_file,3)
