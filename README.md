@@ -29,15 +29,15 @@ The version of the main packages is as follows,
 
 ## Training:<a id="Training"/>
 Use the following command to train the MR-Net.
-> CUDA_VISIBLE_DEVICES=0 python train.py
+> CUDA_VISIBLE_DEVICES=0 python train.py  --data_dir path-to-training file
 
 ## Testing:<a id="Testing"/>
 Use the following command to test the MR-Net. Chamfer Distance (CD), Earth Mover Distance (EMD), Hausdorff Distance (HD) and Point cloud to point cloud (PC-to-PC) error are evaluated in this paper.
-> CUDA_VISIBLE_DEVICES=0 python test.py
+> CUDA_VISIBLE_DEVICES=0 python test.py --data_dir path-to-testing file
 
 ## Demo:<a id="Demo"/>
 To reconstruct 3D cardiac mesh with pretrained model from contours.
-> CUDA_VISIBLE_DEVICES=0 python demo.py
+> CUDA_VISIBLE_DEVICES=0 python demo.py --test_file demo/test.vtk
 
 ## Citation:<a id="Citation"/>
 to do.
