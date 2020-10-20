@@ -19,7 +19,7 @@ The kernal idea is to use dep learning network to mimic the process of deforming
 
 ## Repo Contents:<a id="Repo Contents"/>
 This code is based on [Pixel2mesh](https://github.com/nywang16/Pixel2Mesh), where the GCN block and the mesh loss are mainly from it.
-The point feature extraction is partially referred to [PointNet++]().
+The point feature extraction is partially referred to [PointNet++](https://github.com/charlesq34/pointnet2).
 
 ## Package dependencies:<a id="Package dependencies"/>
 This repository is based on Python2.7, Tensorflow and Tensorlayer.
@@ -29,11 +29,11 @@ The version of the main packages is as follows,
 
 ## Training:<a id="Training"/>
 Use the following command to train the MR-Net.
-> CUDA_VISIBLE_DEVICES=0 python train.py  --data_dir path-to-training file
+> CUDA_VISIBLE_DEVICES=0 python train.py  --data_dir path/to/trainfile/
 
 ## Testing:<a id="Testing"/>
 Use the following command to test the MR-Net. Chamfer Distance (CD), Earth Mover Distance (EMD), Hausdorff Distance (HD) and Point cloud to point cloud (PC-to-PC) error are evaluated in this paper.
-> CUDA_VISIBLE_DEVICES=0 python test.py --data_dir path-to-testing file
+> CUDA_VISIBLE_DEVICES=0 python test.py --data_dir path/to/testfile/
 
 ## Demo:<a id="Demo"/>
 To reconstruct 3D cardiac mesh with pretrained model from contours.
