@@ -62,10 +62,9 @@ model = GCN(placeholders, logging=True)
 
 # Load data, initialize session
 print('start fetch!')
-data_dir = '/localhome/scxc/MICCAI/MICCAI2020_code_organization/data/LVRV_Shapes_Manual/Shapes/train'
-data_list = glob.glob(os.path.join(data_dir, '*.vtk'))   
+data_list = glob.glob(os.path.join(FLAGS.data_dir, '*.vtk'))   
 # Load data
-data = DataFetcher_train_advanced(data_list)
+data = DataFetcher_train(data_list)
 
 
 data.setDaemon(True) ####

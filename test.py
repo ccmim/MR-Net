@@ -21,19 +21,18 @@
 
 import os, sys
 import tensorflow as tf
-from p2m.models_mrnet import GCN
-from p2m.fetcher import *
-#from p2m.cd_dist import nn_distance
+from mrnet.models_mrnet import GCN
+from mrnet.fetcher import *
 sys.path.append('external')
 from tf_approxmatch import approx_match, match_cost
-from p2m.chamfer import nn_distance
+from mrnet.chamfer import nn_distance
 import glob
 from scipy.spatial.distance import directed_hausdorff
 
 # Settings
 flags = tf.app.flags
 FLAGS = flags.FLAGS
-flags.DEFINE_string('data_list', 'Data/train_cardiac0.txt', 'Data list path.')
+flags.DEFINE_string('data_dir', '/localhome/scxc/MICCAI/MICCAI2020_code_organization/data/LVRV_Shapes_Manual/Shapes/train', 'Data folder.')
 flags.DEFINE_float('learning_rate', 3e-5, 'Initial learning rate.')
 flags.DEFINE_integer('hidden', 256, 'Number of units in  hidden layer.')
 flags.DEFINE_integer('feat_dim', 963, 'Number of units in perceptual feature layer.')
@@ -153,11 +152,8 @@ def save_mesh(vert,face,path,id):
     pred_path = path.replace('.vtk', str(id)+'.obj')
     np.savetxt(pred_path, mesh, fmt='%s', delimiter=' ')
     print ('Saved to', pred_path)
-data_dir = '/localhome/scxc/MICCAI/MICCAI2020_code_organization/data/LVRV_Shapes_Manual/Shapes/test'
-data_name = glob.glob(os.path.join(data_dir, '*.vtk'))   
+data_name = glob.glob(os.path.join(FLAGS.data_dir, '*.vtk'))   
 # Load data
-#data = DataFetcher(FLAGS.data_list)
-#data = DataFetcher(data_name)#DataFetcher_test
 data = DataFetcher_test_incomplete(data_name)#DataFetcher_test
 data.setDaemon(True) ####
 data.start()
@@ -175,20 +171,16 @@ xyz12 = tf.reshape(xyz2, [1, 1578,3], name='predict')
 match = approx_match(xyz11, xyz12)
 emd_dist = match_cost(xyz11, xyz12, match)
 
-#match = approx_match(xyz1, xyz2)
-#emd_dist = match_cost(xyz1, xyz2, match)
-
 config=tf.ConfigProto()
 config.gpu_options.allow_growth=True
 config.allow_soft_placement=True
 sess = tf.Session(config=config)
 sess.run(tf.global_variables_initializer())
-#model.load(sess)
-model.load_test(sess)
+model.load(sess)
+
 
 
 # Construct feed dictionary
-#pkl = pickle.load(open('Data/ellipsoid/init1.dat', 'rb'))
 pkl = pickle.load(open('Data/heart/cardiac_template.dat', 'rb')) #init1.dat info_ellipsoid.dat
 feed_dict = construct_feed_dict(pkl, placeholders)
 
@@ -201,15 +193,7 @@ def chamfer_loss_np(A,B):
     t=(r-2*np.matmul(A, np.transpose(B,(0, 2, 1))) 
                                          + np.transpose(r2,(0, 2, 1)))
     return np.mean((np.min(t, axis=1)+np.min(t,axis=2))/2.0,axis=-1)
-def pc_pc_error(A,B):    
-    #a: ground-truth b:predict
-    r=np.sum(A*A,2)
-    r=np.reshape(r,[int(r.shape[0]),int(r.shape[1]),1])
-    r2=np.sum(B*B,2)
-    r2=np.reshape(r2,[int(r.shape[0]),int(r.shape[1]),1])
-    t=(r-2*np.matmul(A, np.transpose(B,(0, 2, 1))) 
-                                         + np.transpose(r2,(0, 2, 1)))
-    return np.mean(np.min(t,axis=1),axis=-1)
+
 def normalize_point_cloud(input):
     """
     input: pc [N, P, 3]
@@ -221,8 +205,6 @@ def normalize_point_cloud(input):
         axis = 1
     centroid = np.mean(input, axis=axis, keepdims=True)
     input = input - centroid
-    #furthest_distance = np.amax(
-    #    np.sqrt(np.sum(input ** 2, axis=-1, keepdims=True)), axis=axis, keepdims=True)
     furthest_distance = 100.00
     input = input / furthest_distance
     return input, centroid, furthest_distance
@@ -289,8 +271,8 @@ print("pc error for Outputs (mean+-std): ", np.mean(pc2pc_patch),np.std(pc2pc_pa
 print("emdfor Outputs (mean+-std): ", np.mean(sum_emd),np.std(sum_emd))
 
 f = np.array(sum_f).mean()
-cd = np.array(sum_cd).mean() #* 1000 #cd is the mean of all distance, cd is L2
-hd = np.array(sum_hd).mean() #* 0.01 #emd is the sum of all distance, emd is L1
+cd = np.array(sum_cd).mean() 
+hd = np.array(sum_hd).mean() 
 print ('f,cd,emd:', f, cd, hd)
 print >> log, len(sum_f), f, cd, emd
 log.close()
@@ -315,10 +297,3 @@ save_mesh(pc_in[0],face1,'input.vtk',1)
 print ('Testing Finished!')
 print (endtime - starttime).seconds
 print('mean inference time:',np.array(pre_time).mean())
-
-import h5py
-with h5py.File('mrnet_manual.h5', 'w') as hf:
-    hf.create_dataset("pcrnet_cd",  data=cd_patch)
-    hf.create_dataset("pcrnet_emd",  data=sum_emd)
-    hf.create_dataset("pcrnet_hd",  data=sum_hd)
-    hf.create_dataset("pcrnet_pc",  data=p2p_error)
