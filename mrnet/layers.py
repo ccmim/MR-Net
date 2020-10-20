@@ -18,17 +18,9 @@
 # Modifications copyright (C) 2013 <Xiang Chen>
 #
 from __future__ import division
-from p2m.inits import *
+from mrnet.inits import *
 import tensorflow as tf
-from p2m.chamfer import *
-#import sugartensor as tf
-
-import sys
-import os
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(BASE_DIR)
-sys.path.append(os.path.join(BASE_DIR, '../utils'))
-import tf_util
+from mrnet.chamfer import *
 
 flags = tf.app.flags
 FLAGS = flags.FLAGS
@@ -463,62 +455,4 @@ class GraphProjection_3D0(Layer):
 		out4 = project_3D(voxel_feature, h, w, c, 352)
 		outputs = tf.concat([coord,out1,out2,out3,out4], 1)
 		print('out4',out4.shape)
-		return outputs
-
-class feature_extract(Layer):
-	"""Graph Pooling layer."""
-	def __init__(self, placeholders, scope0, **kwargs):
-		super(feature_extract, self).__init__(**kwargs)
-
-		self.pc_feat = placeholders['img_feat']
-		self.scope = scope0
-
-	def _call(self, inputs):
-		coord = inputs 
-		X = inputs[:, 0]
-		X = tf.divide(X, X)
-		X = tf.expand_dims(X, 1)
-		gf,shape,xyz1,point_feature1,xyz2,point_feature2 = self.pc_feat
-		
-		bn_decay = 0.99
-		scope = self.scope
-
-		all_feature = tf.tile(gf,[1578, 1])
-		
-		outputs = tf.concat([shape,all_feature], 1)
-		outputs = tf.expand_dims(outputs, 0)
-		outputs = tf.expand_dims(outputs, 2)
-		outputs = tf_util.conv2d(outputs, 256, [1,1],
-                         padding='VALID', stride=[1,1],
-                         bn=True, is_training=FLAGS.learning_rate,
-                         scope=scope+'conv1', bn_decay=bn_decay)
-		outputs = tf_util.conv2d(outputs, 128, [1,1],
-                         padding='VALID', stride=[1,1],
-                         bn=True, is_training=FLAGS.learning_rate,
-                         scope=scope+'conv2', bn_decay=bn_decay)
-		outputs = tf_util.conv2d(outputs, 3, [1,1],
-                         padding='VALID', stride=[1,1],
-                         bn=True, is_training=FLAGS.learning_rate,
-                         scope=scope+'conv3', bn_decay=bn_decay)
-		outputs = tf.squeeze(outputs)
-   
-   
-		xyz1 = tf.squeeze(xyz1)
-		xyz2 = tf.squeeze(xyz2)
-		point_feature1 = tf.squeeze(point_feature1)
-		point_feature2 = tf.squeeze(point_feature2)
-   
-		dist01,idx01,dist02,idx02 = nn_distance(coord, outputs)
-		dist11,idx11,dist12,idx12 = nn_distance(coord, xyz1)
-		dist21,idx21,dist22,idx22 = nn_distance(coord, xyz2)
-   
-		outputs = tf.gather(outputs,idx02)
-		outputs = tf.multiply(tf.squeeze(outputs),tf.reshape(dist01,[-1,1]))
-   
-		point_feature1 = tf.gather(point_feature1,idx12)
-		point_feature1 = tf.multiply(tf.squeeze(point_feature1), tf.reshape(dist11,[-1,1]))
-
-		point_feature2 = tf.gather(point_feature2,idx22)
-		point_feature2 = tf.multiply(tf.squeeze(point_feature2), tf.reshape(dist21,[-1,1]))
-		outputs = tf.concat([coord,outputs,point_feature1,point_feature2], 1)
 		return outputs

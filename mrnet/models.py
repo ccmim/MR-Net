@@ -23,9 +23,6 @@ from __future__ import division
 import tflearn
 from mrnet.layers import *
 from mrnet.losses import *
-import sys
-sys.path.append("..")
-sys.path.append(os.path.join(BASE_DIR, '../utils'))
 from mrnet.pointnet_util import pointnet_sa_module,sample
 import tensorflow as tf
 
@@ -227,7 +224,6 @@ class GCN(Model):
     def build_pc_feature(self):
         x=self.placeholders['img_inp']
         bn_decay = 0.99
-        #x=tf.expand_dims(x, 0)
         v1 = tf.expand_dims(x, 0)
         xyz1, points1, indices1 = pointnet_sa_module(v1, None, npoint=2000, radius=0.2, nsample=32, mlp=[32, 64, 128], mlp2=None, group_all=False, is_training=FLAGS.learning_rate, bn_decay=None, scope='sa_layer1', bn=False,ibn = False, pooling='max', tnet_spec=None, knn=False, use_xyz=True)
         xyz2, points2, indices2 = pointnet_sa_module(xyz1, points1, npoint=1578, radius=0.2, nsample=32, mlp=[32, 64, 128], mlp2=None, group_all=False, is_training=FLAGS.learning_rate, bn_decay=None, scope='sa_layer2', bn=False,ibn = False, pooling='max', tnet_spec=None, knn=False, use_xyz=True)
