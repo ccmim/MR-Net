@@ -185,8 +185,8 @@ vert2 = (vert2 * radius) + center
 vert3 = (vert3 * radius) + center
 
 face1 = np.loadtxt('Data/heart/heart_face1.obj', dtype='|S32')
-face2 = np.loadtxt('Data/heart/heart_face2.obj', dtype='|S32')
-face3 = np.loadtxt('Data/heart/heart_face3.obj', dtype='|S32')
+face2 = np.loadtxt('Data/heart/heart_face1.obj', dtype='|S32')
+face3 = np.loadtxt('Data/heart/heart_face1.obj', dtype='|S32')
 
 test_file = 'demo/test.vtk'
 save_mesh(vert1,face1,test_file,1)
