@@ -150,8 +150,8 @@ class GCN(Model):
         super(GCN, self).__init__(**kwargs)
 
         self.inputs = placeholders['features']
-        self.radius = placeholders['radius']
-        self.center = placeholders['center']
+        #self.radius = placeholders['radius']
+        #self.center = placeholders['center']
         self.placeholders = placeholders
 
         self.optimizer = tf.train.AdamOptimizer(learning_rate=FLAGS.learning_rate)
