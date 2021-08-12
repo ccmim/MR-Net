@@ -121,35 +121,6 @@ class GCN(Model):
         super(GCN, self).__init__(**kwargs)
 
         self.inputs = placeholders['features']
-        self.placeholders = placeholders
-
-        self.optimizer = tf.train.AdamOptimizer(learning_rate=FLAGS.learning_rate)
-
-        self.build()
-
-    def _loss(self):
-        '''
-        for var in self.layers[0].vars.values():
-            self.loss += FLAGS.weight_decay * tf.nn.l2_loss(var)
-        '''
-        self.loss += mesh_loss(self.output1, self.placeholders, 1)
-        self.loss += mesh_loss(self.output2, self.placeholders, 2)
-        self.loss += mesh_loss(self.output3, self.placeholders, 3)
-        self.loss += .1*laplace_loss(self.inputs, self.output1, self.placeholders, 1)
-        self.loss += laplace_loss(self.output1_2, self.output2, self.placeholders, 2)
-        self.loss += laplace_loss(self.output2_2, self.output3, self.placeholders, 3)
-
-        # Weight decay loss
-        conv_layers = range(1,15) + range(17,31) + range(33,48)
-        for layer_id in conv_layers:
-            for var in self.layers[layer_id].vars.values():
-                self.loss += FLAGS.weight_decay * tf.nn.l2_loss(var)
-
-class GCN(Model):
-    def __init__(self, placeholders, **kwargs):
-        super(GCN, self).__init__(**kwargs)
-
-        self.inputs = placeholders['features']
         #self.radius = placeholders['radius']
         #self.center = placeholders['center']
         self.placeholders = placeholders
