@@ -546,7 +546,7 @@ class DataFetcher_test_incomplete(threading.Thread):
 		pc_gt = readvtk_gt(pkl_path)
    
 		#pc
-		mode = 1#np.random.randint(5) 0:all, 2 slices, 3slices, 4slices, 5slices
+		mode = 0#np.random.randint(5) 0:all, 2 slices, 3slices, 4slices, 5slices
 		img = readvtk(img_path,mode)
 
 		return img, pc_gt, label, pkl_path.split('/')[-1]
