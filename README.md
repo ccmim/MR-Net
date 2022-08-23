@@ -38,9 +38,9 @@ tree
     `-- Manual
     |    |-- samplexx.vtk
     |    |-- samplexx.vtk
-	|	...
-	|	
-	`-- Shapes
+    |	...
+    |	
+    `-- Shapes
         |-- samplexx.obj
         |-- samplexx.obj
 		...
