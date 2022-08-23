@@ -52,8 +52,8 @@ placeholders = {
     'faces': [tf.placeholder(tf.int32, shape=(None, 4)) for _ in range(num_blocks)], # helper for face loss (not used)
     'edges': [tf.placeholder(tf.int32, shape=(None, 2)) for _ in range(num_blocks)], # helper for normal loss
     'lape_idx': [tf.placeholder(tf.int32, shape=(None, 10)) for _ in range(num_blocks)], # helper for laplacian regularization
-    'center': tf.placeholder(tf.float32, shape=(1, 3)), #for laplace term
-    'radius': tf.placeholder(tf.float32, shape=(1,1)), #for laplace term
+    #'center': tf.placeholder(tf.float32, shape=(1, 3)), #center of normalisation
+    #'radius': tf.placeholder(tf.float32, shape=(1,1)), #radius of normalisation
     'pool_idx': [tf.placeholder(tf.int32, shape=(None, 2)) for _ in range(num_blocks-1)] # helper for graph unpooling
 }
 model = GCN(placeholders, logging=True)
@@ -103,14 +103,6 @@ def write_points_in_vtp(points, outfile='points.vtp', color=None):
     :param string outfile: name of the output file. The extension has to be .vtp. Default is 'points.vtp'.
     :param tuple color: tuple defining the RGB color to assign to all the points. Default is
         blue: (0, 0, 255).
-
-    :Example:
-
-    >>> import pygem.utils as ut
-    >>> import numpy as np
-
-    >>> ctrl_points = np.arange(9).reshape(3, 3)
-    >>> ut.write_points_in_vtp(ctrl_points, 'example_points.vtp', color=(255, 0, 0))
     """
     if color is None:
         color = (255, 255, 255)
@@ -155,7 +147,7 @@ def save_mesh(vert,face,path,id):
 data_name = glob.glob(os.path.join(FLAGS.data_dir, '*.vtk'))   
 # Load data
 data = DataFetcher_test_incomplete(data_name)#DataFetcher_test
-data.setDaemon(True) ####
+data.setDaemon(True) 
 data.start()
 train_number = data.number
 
@@ -181,7 +173,7 @@ model.load(sess)
 
 
 # Construct feed dictionary
-pkl = pickle.load(open('Data/heart/cardiac_template.dat', 'rb')) #init1.dat info_ellipsoid.dat
+pkl = pickle.load(open('Data/heart/cardiac_template.dat', 'rb')) #load template
 feed_dict = construct_feed_dict(pkl, placeholders)
 
 
@@ -228,7 +220,7 @@ for iters in range(train_number):
 	img_inp, center, radius = normalize_point_cloud(img_inp)
  
 	_, center, radius= normalize_point_cloud(gt_pc)
-	#gt_pc = gt_pc*radius + center 
+
 	target_pc.append(gt_pc)
  
 	feed_dict.update({placeholders['img_inp']: img_inp})
@@ -253,7 +245,7 @@ for iters in range(train_number):
 	f = f_score(gt_pc,predict,d1,d2,[0.0001, 0.0002])
 	sum_f.append(f)
 	sum_cd.append(cd) # cd is the mean of all distance
-	sum_emd.append(emd[0]/1578) # emd is the sum of all distance
+	sum_emd.append(emd[0]/1578) # 1578 points in the reconstructed mesh
 	print ('f,cd,emd', f,cd,emd)
 	print ('processed number', iters)
 
@@ -287,9 +279,9 @@ print('p2p error:', np.mean(p2p_error), np.std(p2p_error))
 log.close()
 sess.close()
 data.shutdown()
-face1 = np.loadtxt('Data/ellipsoid/ori_face.obj', dtype='|S32')
+face1 = np.loadtxt('Data/heart/heart_face1.obj', dtype='|S32')
 
-pc_in  = np.asanyarray(input_pc).reshape(-1,3000,3)
+pc_in = np.asanyarray(input_pc).reshape(-1,3000,3)
 save_mesh(T[0],face1,'gt.vtk',1)
 save_mesh(TS[0],face1,'predict.vtk',1)
 save_mesh(pc_in[0],face1,'input.vtk',1)

@@ -135,7 +135,7 @@ class Model(object):
         if not sess:
             raise AttributeError("TensorFlow session not provided.")
         saver = tf.train.Saver(self.vars)
-        save_path = "Data/checkpoint0_rotate_chosen/%s.ckpt" % self.name #checkpoint13_rotate  checkpoint10_5.19
+        save_path = "Data/checkpoint0_rotate_chosen/%s.ckpt" % self.name
         saver.restore(sess, save_path)
         print("Model restored from file: %s" % save_path)
 

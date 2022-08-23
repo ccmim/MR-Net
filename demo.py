@@ -39,7 +39,7 @@ tf.set_random_seed(seed)
 # Settings
 flags = tf.app.flags
 FLAGS = flags.FLAGS
-flags.DEFINE_string('test_file', 'test/1000739_ED.vtk', 'Testfile dir.')
+flags.DEFINE_string('test_file', 'Demo/test.vtk', 'Testfile dir.')
 flags.DEFINE_float('learning_rate', 0., 'Initial learning rate.')
 flags.DEFINE_integer('hidden', 256, 'Number of units in  hidden layer.')
 flags.DEFINE_integer('feat_dim', 963, 'Number of units in perceptual feature layer.')
@@ -157,11 +157,11 @@ sess.run(tf.global_variables_initializer())
 model.load(sess)
 
 # Runing the demo
-pkl = pickle.load(open('Data/heart/cardiac_template.dat', 'rb')) #init1.dat info_ellipsoid.dat
+pkl = pickle.load(open('Data/heart/cardiac_template.dat', 'rb')) #load template
 feed_dict = construct_feed_dict(pkl, placeholders)
 
 
-mode = 0 #0 full,  1 2 slices, 2-4  3-5 slices.
+mode = 0 #0: all slices,  1: 2 slices, 2-4:  3-5 slices.
 img_inp = readvtk(FLAGS.test_file,mode)
 img_inp = resample_pcd(img_inp,3000)
 
