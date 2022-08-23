@@ -36,10 +36,10 @@ The data folder should be like:
 tree
 `-- Data
     `-- Manual
-        |-- samplexx.vtk
-        |-- samplexx.vtk
-		...
-		
+    |    |-- samplexx.vtk
+    |    |-- samplexx.vtk
+	|	...
+	|	
 	`-- Shapes
         |-- samplexx.obj
         |-- samplexx.obj
