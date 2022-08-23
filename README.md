@@ -38,12 +38,12 @@ tree
     `-- Manual
     |    |-- samplexx.vtk
     |    |-- samplexx.vtk
-    |	...
+    |    ...
     |	
     `-- Shapes
-        |-- samplexx.obj
-        |-- samplexx.obj
-		...
+         |-- samplexx.obj
+         |-- samplexx.obj
+         ...
 		
 ```
 where input point clouds of contours are under '/Manual' folder and GT meshes are under '/Shapes' folder. You may need to change the path on the corresponding code files.
