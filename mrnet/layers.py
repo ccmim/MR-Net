@@ -396,7 +396,7 @@ class GraphProjection_3D(Layer):
 		x = h/(64.0/8)
 		y = w/(64.0/8)
 		z = c/(64.0/8)
-		out4 = project_3D1(self.img_feat[3], x, y, z, 500)#project_3D1_8
+		out4 = project_3D1(self.img_feat[3], x, y, z, 500)
 
 		h = h
 		w = w
@@ -415,44 +415,5 @@ class GraphProjection_3D(Layer):
     
    
 		outputs = tf.concat([coord,out1,out2,out3,out4,out5,out6,out7], 1)
-		print('out4',out4.shape)
-		return outputs
-
-class GraphProjection_3D0(Layer):
-	"""Graph Pooling layer."""
-	def __init__(self, placeholders, **kwargs):
-		super(GraphProjection_3D, self).__init__(**kwargs)
-
-		self.img_feat = placeholders['img_feat']
-
-	def _call(self, inputs):
-		coord = inputs
-		X = inputs[:, 0]
-		Y = inputs[:, 1]
-		Z = inputs[:, 2]
-   
-		h = 64.0 * Y + 32.0
-		w = 64.0 * X + 32.0
-		c = 64.0 * Z + 32.0
-		h = tf.minimum(tf.maximum(h, 0), 63)
-		w = tf.minimum(tf.maximum(w, 0), 63)
-		c = tf.minimum(tf.maximum(c, 0), 63)
-
-		ori = self.img_feat[0]
-		voxel_feature = visialization(ori)
-		out1 = project_3D(voxel_feature, h, w, c, 352)
-
-		pc, f = self.img_feat[2], self.img_feat[4]
-		voxel_feature = visialization(pc,f)
-		out2 = project_3D1(voxel_feature, h, w, c, 128)
-
-		pc,f = self.img_feat[3],self.img_feat[5]
-		voxel_feature = visialization(pc,f)
-		out3 = project_3D1(voxel_feature, h, w, c, 128)
-
-		shape = self.img_feat[1]
-		voxel_feature = visialization(shape)
-		out4 = project_3D(voxel_feature, h, w, c, 352)
-		outputs = tf.concat([coord,out1,out2,out3,out4], 1)
 		print('out4',out4.shape)
 		return outputs

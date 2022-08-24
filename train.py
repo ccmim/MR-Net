@@ -17,8 +17,6 @@
 # Modifications: revise the several details about reading and saving data
 # Modifications copyright (C) 2013 <Xiang Chen>
 
-#session = tf.Session(config=config....)
-
 import tensorflow as tf
 from mrnet.utils import *
 from mrnet.models import GCN
@@ -34,7 +32,7 @@ tf.set_random_seed(seed)
 # Settings
 flags = tf.app.flags
 FLAGS = flags.FLAGS
-flags.DEFINE_string('data_dir', '/localhome/scxc/MICCAI/MICCAI2020_code_organization/data/LVRV_Shapes_Manual/Shapes/train', 'Data folder.') # training data folder
+flags.DEFINE_string('data_dir', 'Data/Shapes/train', 'Data folder.') # training data folder
 flags.DEFINE_float('learning_rate', 1e-5, 'Initial learning rate.')
 flags.DEFINE_integer('epochs', 50, 'Number of epochs to train.')
 flags.DEFINE_integer('hidden', 256, 'Number of units in hidden layer.') # gcn hidden layer channel
@@ -54,8 +52,8 @@ placeholders = {
     'support3': [tf.sparse_placeholder(tf.float32) for _ in range(num_supports)],
     'edges': [tf.placeholder(tf.int32, shape=(None, 2)) for _ in range(num_blocks)], 
     'lape_idx': [tf.placeholder(tf.int32, shape=(None, 10)) for _ in range(num_blocks)], #for laplace term
-    'center': tf.placeholder(tf.float32, shape=(1, 3)), #for laplace term
-    'radius': tf.placeholder(tf.float32, shape=(1,1)), #for laplace term
+    #'center': tf.placeholder(tf.float32, shape=(1, 3)), #center of normalisation
+    #'radius': tf.placeholder(tf.float32, shape=(1,1)), #radius of normalisation
     'pool_idx': [tf.placeholder(tf.int32, shape=(None, 2)) for _ in range(num_blocks-1)] #for unpooling
 }
 model = GCN(placeholders, logging=True)
@@ -67,7 +65,7 @@ data_list = glob.glob(os.path.join(FLAGS.data_dir, '*.vtk'))
 data = DataFetcher_train(data_list)
 
 
-data.setDaemon(True) ####
+data.setDaemon(True) 
 data.start()
 print('++++++++++++++++++++')
 config=tf.ConfigProto()
@@ -80,25 +78,9 @@ sess.run(tf.global_variables_initializer())
 # Train graph model
 train_loss = open('record_train_loss.txt', 'a')
 train_loss.write('Start training, lr =  %f\n'%(FLAGS.learning_rate))
-pkl = pickle.load(open('Data/heart/cardiac_template.dat', 'rb')) 
+pkl = pickle.load(open('Data/heart/cardiac_template.dat', 'rb')) #load template mesh
 feed_dict = construct_feed_dict(pkl, placeholders)
 
-
-def normalize_point_cloud(input):
-    """
-    input: pc [N, P, 3]
-    output: pc, centroid, furthest_distance
-    """
-    if len(input.shape) == 2:
-        axis = 0
-    elif len(input.shape) == 3:
-        axis = 1
-    centroid = np.mean(input, axis=axis, keepdims=True)
-    input = input - centroid
-    furthest_distance = np.amax(
-        np.sqrt(np.sum(input ** 2, axis=-1, keepdims=True)), axis=axis, keepdims=True)
-    input = input / furthest_distance
-    return input, centroid, furthest_distance
 
 train_number = data.number
 for epoch in range(FLAGS.epochs):

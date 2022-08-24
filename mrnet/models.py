@@ -55,8 +55,8 @@ class Model(object):
         self.output3 = None
         self.output1_2 = None
         self.output2_2 = None
-        self.radius = None
-        self.center = None
+        #self.radius = None
+        #self.center = None
 
         self.loss = 0
         self.point_loss = 0
@@ -135,7 +135,7 @@ class Model(object):
         if not sess:
             raise AttributeError("TensorFlow session not provided.")
         saver = tf.train.Saver(self.vars)
-        save_path = "Data/checkpoint0_rotate_chosen/%s.ckpt" % self.name #checkpoint13_rotate  checkpoint10_5.19
+        save_path = "Data/checkpoint0_rotate_chosen/%s.ckpt" % self.name
         saver.restore(sess, save_path)
         print("Model restored from file: %s" % save_path)
 
@@ -144,8 +144,8 @@ class GCN(Model):
         super(GCN, self).__init__(**kwargs)
 
         self.inputs = placeholders['features']
-        self.radius = placeholders['radius']
-        self.center = placeholders['center']
+        #self.radius = placeholders['radius']
+        #self.center = placeholders['center']
         self.placeholders = placeholders
 
         self.optimizer = tf.train.AdamOptimizer(learning_rate=FLAGS.learning_rate)

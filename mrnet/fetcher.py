@@ -64,7 +64,6 @@ def readvtk_gt(filename):
     triangles = cells.GetData()
     points = data.GetPoints()
     np_point = vtk_to_numpy(points.GetData()) 
-    #np_point = resample_pcd(np_point,3000)
     return np_point#[:1578,:]
 
 def normalize_point_cloud(input):
@@ -110,7 +109,7 @@ def readFaceInfo(obj_path):
 				points = np.array([vert_list[p1], vert_list[p2], vert_list[p3]])
 				face_pts = np.append(face_pts, points.reshape(1,3,3), axis=0)
 
-				###!!!!!!!!!!!!###
+				
 				v1 = vert_list[p2] - vert_list[p1]	# x axis
 				v2 = vert_list[p3] - vert_list[p1]
 				f_n = np.cross(v1, v2)		# z axis, face normal
@@ -233,7 +232,7 @@ def readFaceInfo_r(obj_path,R):
 				points = np.array([vert_list[p1], vert_list[p2], vert_list[p3]])
 				face_pts = np.append(face_pts, points.reshape(1,3,3), axis=0)
 
-				###!!!!!!!!!!!!###
+				
 				v1 = vert_list[p2] - vert_list[p1]	# x axis
 				v2 = vert_list[p3] - vert_list[p1]
 				f_n = np.cross(v1, v2)		# z axis, face normal
@@ -270,6 +269,7 @@ def rotation_matrix(axis, theta):
                      [2*(bc-ad), aa+cc-bb-dd, 2*(cd+ab)],
                      [2*(bd+ac), 2*(cd-ab), aa+dd-bb-cc]])
 
+#with data augmentation
 class DataFetcher_train_advanced(threading.Thread):
 	def __init__(self, file_list):
 		super(DataFetcher_train_advanced, self).__init__()

@@ -45,12 +45,12 @@ def construct_feed_dict0(pkl, placeholders):
 def construct_feed_dict(pkl, placeholders):
 	"""Construct feed dictionary."""
 	coord = pkl[0]
-	pool_idx = pkl[5][:2]#
+	pool_idx = pkl[5][:2]
 	faces = pkl[7][:3]
 	
 	lape_idx = pkl[8][:3] #7
 
-	edges = pkl[6]#[]
+	edges = pkl[6]
 
 	feed_dict = dict()
 	feed_dict.update({placeholders['features']: coord})
