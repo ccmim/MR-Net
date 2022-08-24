@@ -32,7 +32,7 @@ tf.set_random_seed(seed)
 # Settings
 flags = tf.app.flags
 FLAGS = flags.FLAGS
-flags.DEFINE_string('data_dir', '/localhome/scxc/MICCAI/MICCAI2020_code_organization/data/LVRV_Shapes_Manual/Shapes/train', 'Data folder.') # training data folder
+flags.DEFINE_string('data_dir', 'Data/Shapes/train', 'Data folder.') # training data folder
 flags.DEFINE_float('learning_rate', 1e-5, 'Initial learning rate.')
 flags.DEFINE_integer('epochs', 50, 'Number of epochs to train.')
 flags.DEFINE_integer('hidden', 256, 'Number of units in hidden layer.') # gcn hidden layer channel

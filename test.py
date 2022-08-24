@@ -21,7 +21,7 @@
 
 import os, sys
 import tensorflow as tf
-from mrnet.models_mrnet import GCN
+from mrnet.models import GCN
 from mrnet.fetcher import *
 sys.path.append('external')
 from tf_approxmatch import approx_match, match_cost
@@ -32,7 +32,7 @@ from scipy.spatial.distance import directed_hausdorff
 # Settings
 flags = tf.app.flags
 FLAGS = flags.FLAGS
-flags.DEFINE_string('data_dir', '/localhome/scxc/MICCAI/MICCAI2020_code_organization/data/LVRV_Shapes_Manual/Shapes/train', 'Data folder.')
+flags.DEFINE_string('data_dir', 'Data/Shapes/train', 'Data folder.')
 flags.DEFINE_float('learning_rate', 3e-5, 'Initial learning rate.')
 flags.DEFINE_integer('hidden', 256, 'Number of units in  hidden layer.')
 flags.DEFINE_integer('feat_dim', 963, 'Number of units in perceptual feature layer.')
