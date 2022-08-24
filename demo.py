@@ -165,7 +165,7 @@ mode = 0 #0: all slices,  1: 2 slices, 2-4:  3-5 slices.
 img_inp = readvtk(FLAGS.test_file,mode)
 img_inp = resample_pcd(img_inp,3000)
 
-write_points_in_vtp(img_inp,'demo/input.vtp')
+write_points_in_vtp(img_inp,FLAGS.test_file.replace('vtk','vtp'))
 img_inp, center, radius = normalize_point_cloud(img_inp)
 def save_mesh(vert,face,path,id):
     pc_path = path.replace('.vtk', str(id)+'.vtp')
@@ -188,7 +188,7 @@ face1 = np.loadtxt('Data/heart/heart_face1.obj', dtype='|S32')
 face2 = np.loadtxt('Data/heart/heart_face1.obj', dtype='|S32')
 face3 = np.loadtxt('Data/heart/heart_face1.obj', dtype='|S32')
 
-test_file = 'demo/test.vtk'
+test_file = FLAGS.test_file
 save_mesh(vert1,face1,test_file,1)
 save_mesh(vert2,face2,test_file,2)
 save_mesh(vert3,face3,test_file,3)
